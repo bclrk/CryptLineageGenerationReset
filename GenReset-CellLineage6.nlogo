@@ -90,38 +90,22 @@ to Propagate [current_line_set]
 
         ; increment line and child_directions; see info tab for convention details
         set line (line + 1)
-        set child_direction (0 - child_direction)    ; "child-direction is flipped with every generation so that the tree remains balanced"
+        ;set child_direction (0 - child_direction)    ; "child-direction is flipped with every generation so that the tree remains balanced"
         set cxcor cxcor + child_direction
 
         ; create a visual link to connect to the tree parent
         create-link-with tree-parent
       ]
     ]
+
     ; we also want the current-cell to move Propagate down the tree and update properties
     ask next-line-cell [
-
-      ;set is_stem? false
-
-      ;-------------------------resets generation-------------------------
-      let level line
-      let genFlag? false
-      ask nodes-on neighbors4 [
-        if line = level and is_stem? and ReportState (age + 1) = "wholly-mature" [
-          set genFlag? true
-        ]
-      ]
-      if genFlag? [
-        set generation 0
-        set is_stem? true                                                   ; and sets is_stem? to true for coloring purposes
-      ]
-      ;------------------------^resets generation^------------------------
-
-
       set age (age + 1)
       set cell_state (ReportState age)
 
-      ; increment line and child_directions; see info tab for convention details
+      ; increment line and child_dirfections; see info tab for convention details
       set line (line + 1)
+      set child_direction (0 - child_direction) ; NEW
       set cxcor cxcor + child_direction
 
       ; create a visual link to connect to the tree parent
@@ -169,8 +153,8 @@ to Draw [current_line_set]
   let i 0
 
   ; loop through and reposition the nodes in the list
-  foreach current_line-list [ ?1 ->
-    ask ?1 [
+  foreach current_line-list [ x ->
+    ask x [
       ; move down to next line
       set cycor cycor - yspace
 
@@ -179,9 +163,27 @@ to Draw [current_line_set]
       ifelse (abs cxcor < max-pxcor and abs cycor < max-pycor)
       [ setxy cxcor cycor ]
       [ hide-turtle ]
-      FormatCell
+      ;FormatCell
     ]
     set i (i + 1)
+  ]
+  foreach current_line-list [ x ->
+    ask x [
+      ;-------------------------resets generation-------------------------
+      if is_stem? and ReportState (age) = "wholly-mature" [
+        ask nodes-on neighbors4 [
+          if line = (current_line + 1) [
+            set generation 0
+            set is_stem? true
+          ]
+        ]
+      ]
+    ]
+  ]
+  foreach current_line-list [ x ->
+    ask x [
+      FormatCell
+    ]
   ]
 end
 
@@ -190,7 +192,7 @@ to FormatCell
   set shape "hex"
   if cell_state = "immature" [ set color red ]
   if cell_state = "mature" [ set color blue ]
-  if cell_state = "wholly-mature" [ set color green - 3 ]
+  if cell_state = "wholly-mature" [ set color lime - 1 ] ;green - 3 ]
   if cell_state = "dead" [ hide-turtle ]
 
   if is_stem? [ set shape "hex outlined" ]
@@ -230,11 +232,11 @@ end
 GRAPHICS-WINDOW
 246
 10
-5194
-2519
+1242
+519
 -1
 -1
-20.0
+4.0
 1
 10
 1
@@ -318,8 +320,8 @@ SLIDER
 lifespan
 lifespan
 1
-200
-14.0
+50
+13.0
 1
 1
 NIL
@@ -379,7 +381,7 @@ gen1-mc
 gen1-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -394,7 +396,7 @@ gen2-mc
 gen2-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -409,7 +411,7 @@ gen3-mc
 gen3-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -424,7 +426,7 @@ gen4-mc
 gen4-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -439,7 +441,7 @@ gen5-mc
 gen5-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -471,7 +473,7 @@ gen6-mc
 gen6-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -486,7 +488,7 @@ gen7-mc
 gen7-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -501,7 +503,7 @@ gen8-mc
 gen8-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -516,7 +518,7 @@ gen9-mc
 gen9-mc
 0
 6
-6.0
+4.0
 1
 1
 NIL
@@ -531,7 +533,7 @@ gen1-wm
 gen1-wm
 0
 12
-9.0
+5.0
 1
 1
 NIL
@@ -546,7 +548,7 @@ gen2-wm
 gen2-wm
 0
 12
-9.0
+6.0
 1
 1
 NIL
@@ -561,7 +563,7 @@ gen3-wm
 gen3-wm
 0
 12
-9.0
+6.0
 1
 1
 NIL
@@ -576,7 +578,7 @@ gen4-wm
 gen4-wm
 0
 12
-9.0
+6.0
 1
 1
 NIL
@@ -591,7 +593,7 @@ gen5-wm
 gen5-wm
 0
 12
-9.0
+6.0
 1
 1
 NIL
@@ -606,7 +608,7 @@ gen6-wm
 gen6-wm
 0
 12
-9.0
+5.0
 1
 1
 NIL
@@ -621,7 +623,7 @@ gen7-wm
 gen7-wm
 0
 12
-9.0
+5.0
 1
 1
 NIL
@@ -636,7 +638,7 @@ gen8-wm
 gen8-wm
 0
 12
-9.0
+5.0
 1
 1
 NIL
@@ -651,7 +653,7 @@ gen9-wm
 gen9-wm
 0
 12
-9.0
+5.0
 1
 1
 NIL
@@ -666,7 +668,7 @@ stem-mc
 stem-mc
 2
 6
-2.0
+4.0
 2
 1
 NIL
@@ -692,7 +694,7 @@ stem-wm
 stem-wm
 0
 25
-9.0
+12.0
 1
 1
 NIL
@@ -1096,6 +1098,108 @@ NetLogo 6.0.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="findsteadystate" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="35"/>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="rabbit?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen3-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen9-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen2-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen2-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen8-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen1-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen9-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen1-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen7-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="immortal-stem-cell?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen8-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no-whole-maturation?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen6-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lifespan">
+      <value value="3"/>
+      <value value="5"/>
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen7-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen5-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen6-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen4-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stem-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stem-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen5-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen3-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen4-wm">
+      <value value="2"/>
+      <value value="4"/>
+      <value value="6"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
