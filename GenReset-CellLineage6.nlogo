@@ -1,3 +1,5 @@
+extensions [vectorview]
+
 breed [nodes node]
 
 globals [current_line xspace yspace]
@@ -111,8 +113,26 @@ to Propagate [current_line_set]
       ; create a visual link to connect to the tree parent
       create-link-with tree-parent
     ]
+
+    ask links [set color 2] ; NEW
+
   ]
 end
+
+to-report numOfCellDivision []
+  let m_s stem-wm - stem-mc    ; I removed m_s
+  let m_1 gen1-wm - gen1-mc
+  let m_2 gen2-wm - gen2-mc
+  let m_3 gen3-wm - gen3-mc
+  let m_4 gen4-wm - gen4-mc
+  let m_5 gen5-wm - gen5-mc
+  let m_6 gen6-wm - gen6-mc
+  let m_7 gen7-wm - gen7-mc
+  let m_8 gen8-wm - gen8-mc
+  let m_9 gen9-wm - gen9-mc
+  report m_1 + m_2 + m_3 + m_4 + m_5 + m_6 + m_7 + m_8 + m_9
+end
+
 
 ;; Defines maturation cycle, life span, and time until whole maturation values for the next generation of cells
 to-report GetCharacteristicParameters [ cell-generation ]
@@ -170,11 +190,21 @@ to Draw [current_line_set]
   foreach current_line-list [ x ->
     ask x [
       ;-------------------------resets generation-------------------------
-      if is_stem? and ReportState (age) = "wholly-mature" [
-        ask nodes-on neighbors4 [
-          if line = (current_line + 1) [
+      if is_stem? and ReportState (age + 1) = "dead" [
+        let myagentset nodes-on neighbors4
+        set myagentset  myagentset with [line = (current_line + 1)]
+        ask max-one-of myagentset [age] [
+          ifelse ReportState (age + 1) != "dead" [
             set generation 0
             set is_stem? true
+          ][
+            let myagentset1 nodes-on neighbors4
+            set myagentset1  myagentset1 with [line = (current_line + 1)]
+            set myagentset1 myagentset1 with [self != x]  ; remove me from agentset
+            ask max-one-of myagentset1 [age] [
+              set generation 0
+              set is_stem? true
+            ]
           ]
         ]
       ]
@@ -314,14 +344,14 @@ immortal-stem-cell?
 
 SLIDER
 122
-150
+151
 226
-183
+184
 lifespan
 lifespan
 1
-50
-13.0
+15
+11.0
 1
 1
 NIL
@@ -374,14 +404,14 @@ NIL
 
 SLIDER
 18
-217
+216
 122
-250
+249
 gen1-mc
 gen1-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -389,14 +419,14 @@ HORIZONTAL
 
 SLIDER
 18
-250
+249
 122
-283
+282
 gen2-mc
 gen2-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -404,14 +434,14 @@ HORIZONTAL
 
 SLIDER
 18
-283
+282
 122
-316
+315
 gen3-mc
 gen3-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -419,14 +449,14 @@ HORIZONTAL
 
 SLIDER
 18
-316
+315
 122
-349
+348
 gen4-mc
 gen4-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -434,14 +464,14 @@ HORIZONTAL
 
 SLIDER
 18
-349
+348
 122
-382
+381
 gen5-mc
 gen5-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -466,14 +496,14 @@ NIL
 
 SLIDER
 18
-382
+381
 122
-415
+414
 gen6-mc
 gen6-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -481,14 +511,14 @@ HORIZONTAL
 
 SLIDER
 18
-415
+414
 122
-448
+447
 gen7-mc
 gen7-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -496,14 +526,14 @@ HORIZONTAL
 
 SLIDER
 18
-448
+447
 122
-481
+480
 gen8-mc
 gen8-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -511,14 +541,14 @@ HORIZONTAL
 
 SLIDER
 18
-481
+480
 122
-514
+513
 gen9-mc
 gen9-mc
 0
 6
-4.0
+6.0
 1
 1
 NIL
@@ -533,7 +563,7 @@ gen1-wm
 gen1-wm
 0
 12
-5.0
+7.0
 1
 1
 NIL
@@ -548,7 +578,7 @@ gen2-wm
 gen2-wm
 0
 12
-6.0
+9.0
 1
 1
 NIL
@@ -563,7 +593,7 @@ gen3-wm
 gen3-wm
 0
 12
-6.0
+7.0
 1
 1
 NIL
@@ -578,7 +608,7 @@ gen4-wm
 gen4-wm
 0
 12
-6.0
+9.0
 1
 1
 NIL
@@ -593,7 +623,7 @@ gen5-wm
 gen5-wm
 0
 12
-6.0
+9.0
 1
 1
 NIL
@@ -608,7 +638,7 @@ gen6-wm
 gen6-wm
 0
 12
-5.0
+7.0
 1
 1
 NIL
@@ -623,7 +653,7 @@ gen7-wm
 gen7-wm
 0
 12
-5.0
+7.0
 1
 1
 NIL
@@ -638,7 +668,7 @@ gen8-wm
 gen8-wm
 0
 12
-5.0
+7.0
 1
 1
 NIL
@@ -653,7 +683,7 @@ gen9-wm
 gen9-wm
 0
 12
-5.0
+7.0
 1
 1
 NIL
@@ -661,14 +691,14 @@ HORIZONTAL
 
 SLIDER
 18
-185
+184
 122
-218
+217
 stem-mc
 stem-mc
 2
 6
-4.0
+6.0
 2
 1
 NIL
@@ -693,12 +723,45 @@ SLIDER
 stem-wm
 stem-wm
 0
-25
-12.0
+12
+10.0
 1
 1
 NIL
 HORIZONTAL
+
+MONITOR
+258
+93
+358
+138
+M/I
+(count nodes with [cell_state = \"mature\"]) / (count nodes with [cell_state = \"immature\"])
+10
+1
+11
+
+MONITOR
+326
+41
+446
+86
+# of cell divisions
+numOfCellDivision
+10
+1
+11
+
+MONITOR
+1018
+24
+1232
+69
+number of cells / number of divisions
+(count nodes with [line = current_line]) / numOfCellDivision
+10
+1
+11
 
 @#$#@#$#@
 ## BACKGROUND
@@ -1198,6 +1261,67 @@ NetLogo 6.0.1
       <value value="4"/>
       <value value="6"/>
     </enumeratedValueSet>
+  </experiment>
+  <experiment name="upperboundQ" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="46"/>
+    <metric>(count turtles with [line = 45]) - (count turtles with [line = 44])</metric>
+    <metric>numOfCellDivision</metric>
+    <enumeratedValueSet variable="rabbit?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen3-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen9-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen2-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen2-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen8-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen1-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen9-wm" first="3" step="1" last="6"/>
+    <steppedValueSet variable="gen1-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen7-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="immortal-stem-cell?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen8-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="no-whole-maturation?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gen6-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lifespan">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen7-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen5-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen6-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen4-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stem-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stem-wm">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen5-wm" first="3" step="1" last="6"/>
+    <enumeratedValueSet variable="gen3-mc">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="gen4-wm" first="3" step="1" last="6"/>
   </experiment>
 </experiments>
 @#$#@#$#@
